@@ -17,7 +17,7 @@
 (defun brightness-update ()
   "Brightness update string."
   (setq display-brightness-string
-	(concat "|  " (car (split-string (shell-command-to-string "getbright") "\n" t)) "%% |")))
+	(concat "|  " (car (split-string (shell-command-to-string "printf \"%.*f\n\" 0 $(xbacklight -get)") "\n" t)) "%% |")))
 
 (defun brightness-update-handler ()
   "Handler for brightness update."
@@ -43,6 +43,9 @@
 (defvar display-volume-string nil
   "Volume displayed string.")
 
+(defvar display-volume-pa-sink "@DEFAULT_SINK@"
+  "What sink to use for getting volume and muted.")
+
 (defvar volume-update-timer nil
   "Blah dont change.")
 
@@ -50,12 +53,15 @@
   "Update volume string."
   (setq display-volume-string
 	(concat
-	 (if (string= " muted" (car (split-string(shell-command-to-string "getmuted") "\n" t)))
+	 (if (string= "yes" (substring (car (split-string (shell-command-to-string (concat "pactl get-sink-mute " display-volume-pa-sink)) "\n" t)) 6))
 	   "|  "
 	   "|  ")
-	 (car (split-string (shell-command-to-string "getvolume") "\n" t))
+         (format "%d" (let* ((cmd (split-string (shell-command-to-string (concat "pactl get-sink-volume " display-volume-pa-sink)) " " t))
+                             (left (string-to-number(car (split-string (nth 4 cmd) "%" t))))
+                             (right (string-to-number(car (split-string (nth 11 cmd) "%" t)))))
+                        (/ (+ left right) 2)))
 	 "%%"
-	 "  |")))
+	 " |")))
 
 (defun volume-update-handler ()
   "Handler for volume update."

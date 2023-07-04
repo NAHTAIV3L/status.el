@@ -1,0 +1,58 @@
+#+TITLE status.el
+
+provides minor modes for emacs that display information status information in the modeline
+
+* minor modes
+** display-volume-mode
+to enable use M-x display-volume-mode or put 
+#+begin_src emacs-lisp
+(display-volume-mode 1)
+#+end_src
+in your init.el
+
+** display-wifi-mode
+to enable use M-x display-wifi-mode or put 
+#+begin_src emacs-lisp
+(display-wifi-mode 1)
+#+end_src
+in your init.el
+
+** display-brightness-mode
+to enable use M-x display-brightness-mode or put 
+#+begin_src emacs-lisp
+(display-brightness-mode 1)
+#+end_src
+in your init.el
+
+* dependencies
+** display-wifi-mode
+depends on NetworkManager
+** display-brightness-mode
+depends on xbacklight
+** display-volume-mode
+depends on pulseaudio
+* installation
+** install from source:
+*** clone the repo
+#+begin_src shell
+  git clone https://github.com/NAHTAIV3L/status.el.git
+#+end_src
+
+*** add to load path and load
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "/path/to/repo")
+  (require 'status)
+#+end_src
+
+** install with straight.el
+*** with straight-use-package
+#+begin_src emacs-lisp
+  (straight-use-package
+   '(status :type git :host github :repo "NAHTAIV3L/status.el"))
+#+end_src
+
+*** with use-package
+#+begin_src emacs-lisp
+  (use-package status
+    :straight '(:package "status.el" :host github :type git :repo "NAHTAIV3L/status.el"))
+#+end_src
