@@ -1,5 +1,3 @@
-#+TITLE status.el
-
 provides minor modes for emacs that display information status information in the modeline
 
 * minor modes
