@@ -6,7 +6,6 @@
 
 (require 'time)
 (require 'battery)
-(require 'posframe)
 
 (defun statusbar--get-buffer ()
   "Return statusbar buffer."
