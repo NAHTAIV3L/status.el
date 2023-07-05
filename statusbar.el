@@ -189,21 +189,7 @@ update which can wait for the next redisplay."
 (defun statusbar-time-event-handler ()
   "Handler for statusbar display time."
   (statusbar-time-update)
-  (let* ((current (current-time))
-         (timer display-time-timer)
-         ;; Compute the time when this timer will run again, next.
-         (next-time (timer-relative-time
-        	     (list (aref timer 1) (aref timer 2) (aref timer 3))
-        	     (* 5 (aref timer 4)) 0)))
-    ;; If the activation time is not in the future,
-    ;; skip executions until we reach a time in the future.
-    ;; This avoids a long pause if Emacs has been suspended for hours.
-    (or (time-less-p current next-time)
-        (progn
-          (timer-set-time timer (timer-next-integral-multiple-of-time
-        			 current display-time-interval)
-        		  display-time-interval)
-          (timer-activate timer)))))
+  (sit-for 0))
 
 (define-minor-mode statusbar-time-mode
   "Toggle display of time, load level, and mail flag in mode lines.
