@@ -34,7 +34,9 @@
         (setq brightness-update-timer (run-at-time nil 1 #'brightness-update-handler))
         (brightness-update))
     (setq global-mode-string (delq 'display-brightness-string global-mode-string))
-    (setq brightness-update-timer nil)))
+    (cancel-timer brightness-update-timer)
+    (setq brightness-update-timer nil)
+    (setq display-brightness-string "")))
 
 ;; --------------------------------------------------------
 ;;                   diplay volume mode
@@ -78,7 +80,9 @@
         (setq volume-update-timer (run-at-time nil 1 #'volume-update-handler))
         (volume-update))
     (setq global-mode-string (delq 'display-volume-string global-mode-string))
-    (setq volume-update-timer nil)))
+    (cancel-timer volume-update-timer)
+    (setq volume-update-timer nil)
+    (setq display-volume-string "")))
 
 ;; --------------------------------------------------------
 ;;                   diplay wifi mode
@@ -126,7 +130,9 @@
         (setq wifi-update-timer (run-at-time nil 1 #'wifi-update-handler))
         (wifi-update))
     (setq global-mode-string (delq 'display-wifi-string global-mode-string))
-    (setq wifi-update-timer nil)))
+    (cancel-timer wifi-update-timer)
+    (setq wifi-update-timer nil)
+    (setq display-wifi-string "")))
 
 (provide 'status)
 ;;; status.el ends here
