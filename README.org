@@ -1,24 +1,59 @@
-provides minor modes for emacs that display information status information in the modeline
+* statusbar.el
+provides minor modes for emacs that display status information in modeline or statusbar
 
 * minor modes
+** statusbar-mode
+displays a statusbar below modeline at the right of the echo area
+to enable use M-x statusbar-mode or put
+#+begin_src emacs-lisp
+(statusbar-mode 1)
+#+end_src
+in your init.el
+*** configuring
+to add strings to be displayed add the symbol to the list: statusbar-strings
+#+begin_src emacs-lisp
+(add-to-list 'statusbar-strings 'your-string-symbol-here)
+#+end_src
+
 ** display-volume-mode
+displays volume from pulseaudio.
 to enable use M-x display-volume-mode or put 
 #+begin_src emacs-lisp
 (display-volume-mode 1)
 #+end_src
 in your init.el
+if statusbar-mode is on then display in the statusbar
 
 ** display-wifi-mode
+displays wifi connection using Networkmanager
 to enable use M-x display-wifi-mode or put 
 #+begin_src emacs-lisp
 (display-wifi-mode 1)
 #+end_src
 in your init.el
+if statusbar-mode is on then display in the statusbar
 
 ** display-brightness-mode
+displays brightness with xbacklight.
 to enable use M-x display-brightness-mode or put 
 #+begin_src emacs-lisp
 (display-brightness-mode 1)
+#+end_src
+in your init.el
+if statusbar-mode is on then display in the statusbar
+
+** statusbar-battery-mode
+displays battery percentage in statusbar
+to enable use M-x statusbar-battery-mode or put
+#+begin_src emacs-lisp
+(statusbar-battery-mode 1)
+#+end_src
+in your init.el
+** statusbar-time-mode
+displays time in statusbar.
+to enable use M-x statusbar-time-mode or put
+#+begin_src emacs-lisp
+(statusbar-time-mode 1)
 #+end_src
 in your init.el
 
