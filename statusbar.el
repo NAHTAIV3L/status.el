@@ -85,7 +85,7 @@ S1 can be a string."
   "Update battery status information in the statusbar."
   (let* ((data (and battery-status-function (funcall battery-status-function)))
          (percentage (car (read-from-string (cdr (assq ?p data)))))
-         (state (cdr (assq ?b (funcall battery-status-function))))
+         (state (cdr (assq ?b data)))
          (res (format "|  %s%s%% |" state percentage))
          (len (length res)))
     (unless (zerop len)
@@ -218,10 +218,13 @@ runs the normal hook `display-time-hook' after each update."
 (defvar brightness-update-timer nil
   "Blah dont change.")
 
+(defvar brightness-shellcommand "backlightctrl -get"
+  "Change to get the brightness for your system.")
+
 (defun brightness-update ()
   "Brightness update string."
   (setq display-brightness-string
-	(concat "|  " (car (split-string (shell-command-to-string "printf \"%.*f\n\" 0 $(xbacklight -get)") "\n" t)) (if statusbar-mode "% |" "%% |"))))
+	(concat "|  " (car (split-string (shell-command-to-string brightness-shellcommand) "\n" t)) (if statusbar-mode "% |" "%% |"))))
 
 (defun brightness-update-handler ()
   "Handler for brightness update."
