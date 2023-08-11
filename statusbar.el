@@ -223,8 +223,11 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun brightness-update ()
   "Brightness update string."
-  (setq display-brightness-string
-	(concat "|  " (car (split-string (shell-command-to-string brightness-shellcommand) "\n" t)) (if statusbar-mode "% |" "%% |"))))
+  (let* ((percent (car (split-string (shell-command-to-string brightness-shellcommand) "\n" t)))
+         (str (concat "|  " percent (if statusbar-mode "% |" "%% |")))
+         (len (length str)))
+    (put-text-property 0 len 'help-echo (format "Brightness: %s%%" percent) str)
+    (setq display-brightness-string str)))
 
 (defun brightness-update-handler ()
   "Handler for brightness update."
@@ -261,17 +264,16 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun volume-update ()
   "Update volume string."
-  (setq display-volume-string
-	(concat
-	 (if (string= "yes" (substring (car (split-string (shell-command-to-string (concat "pactl get-sink-mute " display-volume-pa-sink)) "\n" t)) 6))
-	   "|  "
-	   "|  ")
-         (format "%d" (let* ((cmd (split-string (shell-command-to-string (concat "pactl get-sink-volume " display-volume-pa-sink)) " " t))
-                             (left (string-to-number(car (split-string (nth 4 cmd) "%" t))))
-                             (right (string-to-number(car (split-string (nth 11 cmd) "%" t)))))
-                        (/ (+ left right) 2)))
-	 (if statusbar-mode "%" "%%")
-	 " |")))
+  (let* ((muted (string= "yes" (substring (car (split-string (shell-command-to-string (concat "pactl get-sink-mute " display-volume-pa-sink)) "\n" t)) 6)))
+         (vol (format "%d" (let* ((cmd (split-string (shell-command-to-string (concat "pactl get-sink-volume " display-volume-pa-sink)) " " t))
+                                  (left (string-to-number(car (split-string (nth 4 cmd) "%" t))))
+                                  (right (string-to-number(car (split-string (nth 11 cmd) "%" t)))))
+                             (/ (+ left right) 2))))
+
+         (str (concat (if muted "|  " "|  ") vol (if statusbar-mode "%" "%%") " |"))
+         (len (length str)))
+    (put-text-property 0 len 'help-echo (format "Volume: %s%% Muted: %s" vol muted) str)
+    (setq display-volume-string str)))
 
 (defun volume-update-handler ()
   "Handler for volume update."
@@ -305,24 +307,12 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun wifi-update ()
   "Update wifi string."
-  (let ((essid
-	 (car
-	  (split-string
-	   (or
-	    (car
-	    (split-string
-	     (shell-command-to-string "nmcli -t -f name,device connection show --active | grep -v lo:lo")
-	     "\n" t))
-	    "")
-	   ":" t)))
-        (connection
-	 (car
-	  (split-string
-	   (shell-command-to-string "awk 'NR==3 {print $3}' /proc/net/wireless | cut -d. -f1")
-	   "\n" t))))
-    (if (equal essid nil)
-      (setq display-wifi-string "|  NO SIGNAL |")
-      (setq display-wifi-string (concat (format "|  %s %s" essid connection) (if statusbar-mode "% |" "%% |"))))))
+  (let* ((essid (car (split-string (or (string-trim (shell-command-to-string "nmcli -t -f name,device connection show --active | grep -v lo:lo")) "") ":" t)))
+         (connection (string-trim (shell-command-to-string "awk 'NR==3 {print $3}' /proc/net/wireless | cut -d. -f1")))
+         (str (if (not essid) "|  NO SIGNAL |" (concat (format "|  %s %s" essid connection) (if statusbar-mode "% |" "%% |"))))
+         (len (length str)))
+    (put-text-property 0 len 'help-echo (format "Wifi: essid: %s | connection strength: %s%%" essid connection) str)
+    (setq display-wifi-string str)))
 
 (defun wifi-update-handler ()
   "Handler for wifi update."
