@@ -24,7 +24,7 @@ Position the statusbar in the bottom right over the minibuffer."
   (let* ((font-width (plist-get info :font-width))
          (buf (plist-get info :posframe-buffer))
          (buf-width (* font-width (statusbar--line-length buf)))
-         (parent-frame (plist-get info :parent-frame))
+         (parent-frame (or (frame-parent (plist-get info :parent-frame)) (plist-get info :parent-frame)))
          (parent-frame-width (frame-pixel-width parent-frame))
          (x-offset (plist-get info :x-pixel-offset))
          (x-pos (- parent-frame-width buf-width x-offset))
