@@ -302,16 +302,18 @@ runs the normal hook `display-time-hook' after each update."
 (defvar display-wifi-string nil
   "Volume displayed string.")
 
+(defvar display-wifi-essid-command "nmcli -t -f name,device connection show --active | grep -v lo:lo | cut -d: -f1"
+  "Should get the essid of wifi connected to.")
+
 (defvar wifi-update-timer nil
   "Blah dont change.")
 
 (defun wifi-update ()
   "Update wifi string."
-  (let* ((essid (car (split-string (or (string-trim (shell-command-to-string "nmcli -t -f name,device connection show --active | grep -v lo:lo")) "") ":" t)))
-         (connection (string-trim (shell-command-to-string "awk 'NR==3 {print $3}' /proc/net/wireless | cut -d. -f1")))
-         (str (if (not essid) "|  NO SIGNAL |" (concat (format "|  %s %s" essid connection) (if statusbar-mode "% |" "%% |"))))
+  (let* ((essid (string-trim (shell-command-to-string display-wifi-essid-command)))
+         (str (if (string= essid "") "|  NO SIGNAL |" (format "|  %s |" essid)))
          (len (length str)))
-    (put-text-property 0 len 'help-echo (format "Wifi: essid: %s | connection strength: %s%%" essid connection) str)
+    (put-text-property 0 len 'help-echo (format "Wifi: essid: %s" essid) str)
     (setq display-wifi-string str)))
 
 (defun wifi-update-handler ()
