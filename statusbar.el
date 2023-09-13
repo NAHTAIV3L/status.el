@@ -302,8 +302,11 @@ runs the normal hook `display-time-hook' after each update."
 (defvar display-wifi-string nil
   "Volume displayed string.")
 
-(defvar display-wifi-essid-command "nmcli -t -f name,device connection show --active | grep -v lo:lo | cut -d: -f1"
+(defvar display-wifi-essid-command "iw dev $(ip addr | awk '/state UP/ {gsub(\":\",\"\"); print $2}') link | awk '/SSID:/ {printf $2}'"
   "Should get the essid of wifi connected to.")
+
+(defvar display-wifi-connection-command "iw dev $(ip addr | awk '/state UP/ {gsub(\":\",\"\"); print $2}') link | awk '/signal:/ {gsub(\"-\",\"\"); printf $2}'"
+  "Should get the connection strength of wifi connected to.")
 
 (defvar wifi-update-timer nil
   "Blah dont change.")
@@ -311,7 +314,8 @@ runs the normal hook `display-time-hook' after each update."
 (defun wifi-update ()
   "Update wifi string."
   (let* ((essid (string-trim (shell-command-to-string display-wifi-essid-command)))
-         (str (if (string= essid "") "|  NO SIGNAL |" (format "|  %s |" essid)))
+         (connection (string-trim (shell-command-to-string display-wifi-connection-command)))
+         (str (if (string= essid "") "|  NO SIGNAL |" (concat (format "|  %s %s" essid connection) (if statusbar-mode "% |" "%% |"))))
          (len (length str)))
     (put-text-property 0 len 'help-echo (format "Wifi: essid: %s" essid) str)
     (setq display-wifi-string str)))
