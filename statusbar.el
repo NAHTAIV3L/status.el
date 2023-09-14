@@ -7,7 +7,7 @@
 (require 'time)
 (require 'battery)
 (require 'posframe)
-(require 'cl)
+(require 'cl-lib)
 
 (defun statusbar--get-buffer ()
   "Return statusbar buffer."
@@ -53,7 +53,7 @@ S1 can be a string."
         (buffer-read-only nil)
         (inhibit-read-only t))
     (posframe-show buf
-                   :string (-reduce #'symbol-concat statusbar-strings)
+                   :string (cl-reduce #'symbol-concat statusbar-strings)
                    :poshandler #'statusbar--position-handler)))
 
 (defun statusbar-update-handler ()
