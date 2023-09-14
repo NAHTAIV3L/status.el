@@ -302,7 +302,7 @@ runs the normal hook `display-time-hook' after each update."
 (defvar display-wifi-string nil
   "Volume displayed string.")
 
-(defvar display-wifi-essid-command "iw dev $(ip addr | awk '/state UP/ {gsub(\":\",\"\"); print $2}') link | awk '/SSID:/ {printf $2}'"
+(defvar display-wifi-essid-command "iw dev $(ip addr | awk '/state UP/ {gsub(\":\",\"\"); print $2}') link | grep SSID: | cut -d':' -f2"
   "Should get the essid of wifi connected to.")
 
 (defvar display-wifi-connection-command "iw dev $(ip addr | awk '/state UP/ {gsub(\":\",\"\"); print $2}') link | awk '/signal:/ {gsub(\"-\",\"\"); printf $2}'"
