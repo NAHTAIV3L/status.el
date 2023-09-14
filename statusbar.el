@@ -6,7 +6,6 @@
 
 (require 'time)
 (require 'battery)
-(require 'posframe)
 (require 'cl-lib)
 
 (defun statusbar--get-buffer ()
