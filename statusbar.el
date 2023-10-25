@@ -30,7 +30,7 @@ Position the statusbar in the bottom right over the minibuffer."
          (parent-frame-width (frame-pixel-width parent-frame))
          (x-offset (plist-get info :x-pixel-offset))
          (x-pos (- parent-frame-width buf-width x-offset))
-         (y-pos -1))
+         (y-pos 0))
     (cons x-pos y-pos)))
 
 (defun symbol-concat (s1 s2)
@@ -40,7 +40,7 @@ S1 can be a string."
       (concat (symbol-value s1) (symbol-value s2))
     (concat s1 (symbol-value s2))))
 
-(defvar statusbar-strings (list 'display-wifi-string 'display-volume-string 'display-brightness-string 'battery-statusbar-string 'statusbar-time-string)
+(defvar statusbar-strings (list 'display-externalcmd-string 'display-wifi-string 'display-volume-string 'display-brightness-string 'battery-statusbar-string 'statusbar-time-string)
   "List of strings for statusbar.")
 
 (defvar statusbar-update-timer nil
@@ -67,9 +67,17 @@ S1 can be a string."
   (if statusbar-mode
       (progn
         (setq statusbar-update-timer (run-at-time nil 1 #'statusbar-update-handler))
+    (setq-default header-line-format "")
+    (mapc (lambda (b) (with-current-buffer b
+                        (or header-line-format
+                            (setq-local header-line-format "")))) (buffer-list))
         (statusbar-update))
     (cancel-timer statusbar-update-timer)
     (setq statusbar-update-timer nil)
+    (setq-default header-line-format nil)
+    (mapc (lambda (b) (with-current-buffer b
+                        (and (eq header-line-format "")
+                             (setq-local header-line-format nil)))) (buffer-list))
     (posframe-delete-frame (statusbar--get-buffer))))
 
 ;; --------------------------------------------------------
@@ -341,6 +349,43 @@ runs the normal hook `display-time-hook' after each update."
     (cancel-timer wifi-update-timer)
     (setq wifi-update-timer nil)
     (setq display-wifi-string "")))
+
+;; --------------------------------------------------------
+;;                   diplay externalcmd mode
+;; --------------------------------------------------------
+
+(defvar display-externalcmd-string nil
+  "Volume displayed string.")
+
+(defvar externalcmd-update-timer nil
+  "Blah dont change.")
+
+(defvar externalcmd-shellcommand ""
+  "Any command you want.")
+
+(defun externalcmd-update ()
+  "Externalcmd update string."
+    (setq display-externalcmd-string (string-trim (shell-command-to-string externalcmd-shellcommand))))
+
+(defun externalcmd-update-handler ()
+  "Handler for externalcmd update."
+  (externalcmd-update)
+  (sit-for 0))
+
+(define-minor-mode display-externalcmd-mode
+  "Displays the volume and whether or not its muted."
+  :global t :group 'display-externalcmd
+  (if display-externalcmd-mode
+      (progn
+        (or statusbar-mode
+            (or (memq 'display-externalcmd-string global-mode-string)
+            (add-to-list 'global-mode-string 'display-externalcmd-string t)))
+        (setq externalcmd-update-timer (run-at-time nil 1 #'externalcmd-update-handler))
+        (externalcmd-update))
+    (setq global-mode-string (delq 'display-externalcmd-string global-mode-string))
+    (cancel-timer externalcmd-update-timer)
+    (setq externalcmd-update-timer nil)
+    (setq display-externalcmd-string "")))
 
 (provide 'statusbar)
 ;;; statusbar.el ends here
