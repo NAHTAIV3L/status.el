@@ -30,7 +30,7 @@ Position the statusbar in the bottom right over the minibuffer."
          (parent-frame-width (frame-pixel-width parent-frame))
          (x-offset (plist-get info :x-pixel-offset))
          (x-pos (- parent-frame-width buf-width x-offset))
-         (y-pos 0))
+         (y-pos -1))
     (cons x-pos y-pos)))
 
 (defun symbol-concat (s1 s2)
@@ -67,17 +67,9 @@ S1 can be a string."
   (if statusbar-mode
       (progn
         (setq statusbar-update-timer (run-at-time nil 1 #'statusbar-update-handler))
-    (setq-default header-line-format "")
-    (mapc (lambda (b) (with-current-buffer b
-                        (or header-line-format
-                            (setq-local header-line-format "")))) (buffer-list))
         (statusbar-update))
     (cancel-timer statusbar-update-timer)
     (setq statusbar-update-timer nil)
-    (setq-default header-line-format nil)
-    (mapc (lambda (b) (with-current-buffer b
-                        (and (eq header-line-format "")
-                             (setq-local header-line-format nil)))) (buffer-list))
     (posframe-delete-frame (statusbar--get-buffer))))
 
 ;; --------------------------------------------------------
