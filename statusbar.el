@@ -225,7 +225,7 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun brightness-update ()
   "Brightness update string."
-  (let* ((percent (car (split-string (shell-command-to-string brightness-shellcommand) "\n" t)))
+  (let* ((percent (car (split-string (with-existing-directory (shell-command-to-string brightness-shellcommand)) "\n" t)))
          (str (concat "|  " percent (if statusbar-mode "% |" "%% |")))
          (len (length str)))
     (put-text-property 0 len 'help-echo (format "Brightness: %s%%" percent) str)
@@ -266,8 +266,8 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun volume-update ()
   "Update volume string."
-  (let* ((muted (string= "yes" (substring (car (split-string (shell-command-to-string (concat "pactl get-sink-mute " display-volume-pa-sink)) "\n" t)) 6)))
-         (vol (format "%d" (let* ((cmd (split-string (shell-command-to-string (concat "pactl get-sink-volume " display-volume-pa-sink)) " " t))
+  (let* ((muted (string= "yes" (substring (car (split-string (with-existing-directory (shell-command-to-string (concat "pactl get-sink-mute " display-volume-pa-sink))) "\n" t)) 6)))
+         (vol (format "%d" (let* ((cmd (split-string (with-existing-directory (shell-command-to-string (concat "pactl get-sink-volume " display-volume-pa-sink))) " " t))
                                   (left (string-to-number(car (split-string (nth 4 cmd) "%" t))))
                                   (right (string-to-number(car (split-string (nth 11 cmd) "%" t)))))
                              (/ (+ left right) 2))))
@@ -315,8 +315,8 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun wifi-update ()
   "Update wifi string."
-  (let* ((essid (string-trim (shell-command-to-string display-wifi-essid-command)))
-         (connection (string-trim (shell-command-to-string display-wifi-connection-command)))
+  (let* ((essid (string-trim (with-existing-directory (shell-command-to-string display-wifi-essid-command))))
+         (connection (string-trim (with-existing-directory (shell-command-to-string display-wifi-connection-command))))
          (str (if (string= essid "") "|  NO SIGNAL |" (concat (format "|  %s %s" essid connection) (if statusbar-mode "% |" "%% |"))))
          (len (length str)))
     (put-text-property 0 len 'help-echo (format "Wifi: essid: %s" essid) str)
@@ -357,7 +357,7 @@ runs the normal hook `display-time-hook' after each update."
 
 (defun externalcmd-update ()
   "Externalcmd update string."
-    (setq display-externalcmd-string (string-trim (shell-command-to-string externalcmd-shellcommand))))
+    (setq display-externalcmd-string (string-trim (with-existing-directory (shell-command-to-string externalcmd-shellcommand)))))
 
 (defun externalcmd-update-handler ()
   "Handler for externalcmd update."
